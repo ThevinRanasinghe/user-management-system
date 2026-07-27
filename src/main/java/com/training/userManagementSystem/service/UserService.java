@@ -1,6 +1,7 @@
 package com.training.userManagementSystem.service;
 
 
+import com.training.userManagementSystem.dto.LoginRequest;
 import com.training.userManagementSystem.dto.RegisterRequest;
 import com.training.userManagementSystem.entity.User;
 import com.training.userManagementSystem.repository.UserRepository;
@@ -32,11 +33,11 @@ public class UserService {
         return userRepository.save(registerUser);
     }
 
-    public User loginUser(String email, String password){
-        User user = userRepository.findByEmail(email)
+    public User loginUser(LoginRequest loginRequest){
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
 
-        if(!user.getPassword().equals(password)){
+        if(!user.getPassword().equals(loginRequest.getPassword())){
             throw new IllegalArgumentException("Invalid Email or Password");
         }
 

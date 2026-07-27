@@ -1,6 +1,7 @@
 package com.training.userManagementSystem.controller;
 
 
+import com.training.userManagementSystem.dto.LoginRequest;
 import com.training.userManagementSystem.dto.RegisterRequest;
 import com.training.userManagementSystem.entity.User;
 import com.training.userManagementSystem.service.UserService;
@@ -30,10 +31,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody Map<String, String> loginRequest){
-        String email = loginRequest.get("email");
-        String password = loginRequest.get("password");
-        User user = userService.loginUser(email,password);
+    public ResponseEntity<User> loginUser(@Valid @RequestBody LoginRequest loginRequest){
+
+        User user = userService.loginUser(loginRequest);
         return new ResponseEntity<>(user, HttpStatus.OK );
     }
 
