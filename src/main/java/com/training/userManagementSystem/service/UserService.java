@@ -4,6 +4,8 @@ package com.training.userManagementSystem.service;
 import com.training.userManagementSystem.dto.LoginRequest;
 import com.training.userManagementSystem.dto.RegisterRequest;
 import com.training.userManagementSystem.entity.User;
+import com.training.userManagementSystem.exception.BadRequestException;
+import com.training.userManagementSystem.exception.ResourceNotFoundException;
 import com.training.userManagementSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,9 +22,9 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User registerUser(RegisterRequest request){
-        if(userRepository.existsByEmail(request.getEmail())){
-            throw new IllegalArgumentException("Email Is Already Registered");
+    public User registerUser(User user){
+        if(userRepository.existsByEmail(user.getEmail())){
+            throw new BadRequestException("Email Is Already Registered");
         }
 
         User registerUser = new User();
@@ -33,12 +35,12 @@ public class UserService {
         return userRepository.save(registerUser);
     }
 
-    public User loginUser(LoginRequest loginRequest){
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
+    public User loginUser(String email, String password){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("Email not Found"));
 
-        if(!user.getPassword().equals(loginRequest.getPassword())){
-            throw new IllegalArgumentException("Invalid Email or Password");
+        if(!user.getPassword().equals(password)){
+            throw new BadRequestException("Invlaid Password for the given Email");
         }
 
         return user;
@@ -50,7 +52,7 @@ public class UserService {
 
     public User getUserById(Long id){
         return userRepository.findById(id)
-                .orElseThrow(() ->new IllegalArgumentException("Cannot find User with id " +id));
+                .orElseThrow(() ->new ResourceNotFoundException("Cannot find User with id " +id));
     }
 
     public User updateUser(Long id, User updateUser){
