@@ -3,6 +3,7 @@ package com.training.userManagementSystem.controller;
 
 import com.training.userManagementSystem.dto.LoginRequest;
 import com.training.userManagementSystem.dto.RegisterRequest;
+import com.training.userManagementSystem.dto.UpdateUserRequest;
 import com.training.userManagementSystem.entity.User;
 import com.training.userManagementSystem.service.UserService;
 import jakarta.validation.Valid;
@@ -50,8 +51,8 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
-        User updatedUser = userService.updateUser(id, user);
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid UpdateUserRequest updateUser) {
+        User updatedUser = userService.updateUser(id, updateUser);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 

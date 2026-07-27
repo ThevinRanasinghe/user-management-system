@@ -3,10 +3,10 @@ package com.training.userManagementSystem.service;
 
 import com.training.userManagementSystem.dto.LoginRequest;
 import com.training.userManagementSystem.dto.RegisterRequest;
+import com.training.userManagementSystem.dto.UpdateUserRequest;
 import com.training.userManagementSystem.entity.User;
-import com.training.userManagementSystem.exception.BadRequestException;
-import com.training.userManagementSystem.exception.ResourceNotFoundException;
 import com.training.userManagementSystem.repository.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,25 +22,25 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User registerUser(User user){
-        if(userRepository.existsByEmail(user.getEmail())){
-            throw new BadRequestException("Email Is Already Registered");
+    public User registerUser(RegisterRequest registerUser){
+        if(userRepository.existsByEmail(registerUser.getEmail())){
+            throw new IllegalArgumentException("Email Is Already Registered");
         }
+        User newUser = new User();
+        newUser.setName(registerUser.getName());
+        newUser.setEmail(registerUser.getEmail());
+        newUser.setPassword(registerUser.getEmail());
 
-        User registerUser = new User();
-        registerUser.setName(request.getName());
-        registerUser.setEmail(request.getEmail());
-        registerUser.setPassword(request.getPassword());
-
-        return userRepository.save(registerUser);
+        User savedUser = userRepository.save(newUser);
+        return savedUser;
     }
 
-    public User loginUser(String email, String password){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BadRequestException("Email not Found"));
+    public User loginUser(LoginRequest loginRequest){
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
 
-        if(!user.getPassword().equals(password)){
-            throw new BadRequestException("Invlaid Password for the given Email");
+        if(!user.getPassword().equals(loginRequest.getPassword())){
+            throw new IllegalArgumentException("Invlaid Email or Password");
         }
 
         return user;
@@ -52,10 +52,10 @@ public class UserService {
 
     public User getUserById(Long id){
         return userRepository.findById(id)
-                .orElseThrow(() ->new ResourceNotFoundException("Cannot find User with id " +id));
+                .orElseThrow(() ->new IllegalArgumentException("Cannot find User with id " +id));
     }
 
-    public User updateUser(Long id, User updateUser){
+    public User updateUser(Long id, @Valid UpdateUserRequest updateUser){
         User existingUser = getUserById(id);
         existingUser.setName(updateUser.getName());
         existingUser.setEmail(updateUser.getEmail());

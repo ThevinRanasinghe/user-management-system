@@ -37,10 +37,6 @@ public class User {
 
     @NotBlank(message="Password is required")
     @Size(min=4,max=50,message="Password should be length of more than 4 Characters")
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).*$",
-            message = "Password must contain uppercase, lowercase, digit, and special character"
-    )
     @Column(nullable=false)
     private String password;
 }
