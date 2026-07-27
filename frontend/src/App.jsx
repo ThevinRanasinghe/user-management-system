@@ -1,24 +1,13 @@
-import { useEffect, useState } from 'react';
-import api from './api/axiosConfig';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Login from './pages/Login';
 
 function App() {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    api.get('/users')
-      .then((response) => {
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching users:', error);
-      });
-  }, []);
-
   return (
-    <div>
-      <h1>Users (test)</h1>
-      <pre>{JSON.stringify(users, null, 2)}</pre>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
