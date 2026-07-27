@@ -1,6 +1,7 @@
 package com.training.userManagementSystem.service;
 
 
+import com.training.userManagementSystem.dto.RegisterRequest;
 import com.training.userManagementSystem.entity.User;
 import com.training.userManagementSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,17 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User registerUser(User user){
-        if(userRepository.existsByEmail(user.getEmail())){
+    public User registerUser(RegisterRequest request){
+        if(userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("Email Is Already Registered");
         }
-        return userRepository.save(user);
+
+        User registerUser = new User();
+        registerUser.setName(request.getName());
+        registerUser.setEmail(request.getEmail());
+        registerUser.setPassword(request.getPassword());
+
+        return userRepository.save(registerUser);
     }
 
     public User loginUser(String email, String password){
@@ -30,7 +37,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
 
         if(!user.getPassword().equals(password)){
-            throw new IllegalArgumentException("Invlaid Email or Password");
+            throw new IllegalArgumentException("Invalid Email or Password");
         }
 
         return user;

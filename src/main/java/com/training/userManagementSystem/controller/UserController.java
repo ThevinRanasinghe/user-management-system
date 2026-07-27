@@ -1,6 +1,7 @@
 package com.training.userManagementSystem.controller;
 
 
+import com.training.userManagementSystem.dto.RegisterRequest;
 import com.training.userManagementSystem.entity.User;
 import com.training.userManagementSystem.service.UserService;
 import jakarta.validation.Valid;
@@ -23,8 +24,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody User user){
-        User savedUser = userService.registerUser(user);
+    public ResponseEntity<User> registerUser(@Valid @RequestBody RegisterRequest request){
+        User savedUser = userService.registerUser(request);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
