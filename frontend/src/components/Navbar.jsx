@@ -13,10 +13,10 @@ function Navbar() {
   if (!user) return null;
 
   return (
-    <nav style={{ padding: '10px', borderBottom: '1px solid #ccc', marginBottom: '20px' }}>
+    <nav className="navbar">
       <Link to="/dashboard" style={{ marginRight: '15px' }}>Dashboard</Link>
       <Link to="/users" style={{ marginRight: '15px' }}>Users</Link>
-      <span style={{ marginRight: '15px' }}>Logged in as {user.name}</span>
+      <span className="navbar-user">Logged in as {user.name}</span>
       <button onClick={handleLogout}>Logout</button>
     </nav>
   );

@@ -30,10 +30,10 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label>Email</label>
           <input
             type="email"
@@ -42,7 +42,7 @@ function Login() {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Password</label>
           <input
             type="password"
@@ -51,10 +51,10 @@ function Login() {
             required
           />
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Login</button>
+        {error && <p className="form-error">{error}</p>}
+        <button type="submit" className="form-submit">Login</button>
       </form>
-      <p>
+      <p className="form-footer">
         Don't have an account? <Link to="/register">Register here</Link>
       </p>
     </div>
