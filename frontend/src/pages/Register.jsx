@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axiosConfig';
+import { validateRegisterForm } from '../utils/validation';
 
 function Register() {
   const [name, setName] = useState('');
@@ -10,28 +11,34 @@ function Register() {
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setSuccessMessage('');
+ const handleSubmit = async (e) => {
+   e.preventDefault();
+   setErrors({});
+   setSuccessMessage('');
 
-    try {
-      await api.post('/register', { name, email, password });
-      setSuccessMessage('Registration successful! Redirecting to login...');
-      setTimeout(() => navigate('/login'), 1500);
-    } catch (err) {
-      if (err.response && err.response.data) {
-        const data = err.response.data;
-        if (data.validationErrors) {
-          setErrors(data.validationErrors);
-        } else if (data.message) {
-          setErrors({ general: data.message });
-        }
-      } else {
-        setErrors({ general: 'Something went wrong. Please try again.' });
-      }
-    }
-  };
+   const validationErrors = validateRegisterForm({ name, email, password });
+   if (Object.keys(validationErrors).length > 0) {
+     setErrors(validationErrors);
+     return;
+   }
+
+   try {
+     await api.post('/register', { name, email, password });
+     setSuccessMessage('Registration successful! Redirecting to login...');
+     setTimeout(() => navigate('/login'), 1500);
+   } catch (err) {
+     if (err.response && err.response.data) {
+       const data = err.response.data;
+       if (data.validationErrors) {
+         setErrors(data.validationErrors);
+       } else if (data.message) {
+         setErrors({ general: data.message });
+       }
+     } else {
+       setErrors({ general: 'Something went wrong. Please try again.' });
+     }
+   }
+ };
 
   return (
     <div>

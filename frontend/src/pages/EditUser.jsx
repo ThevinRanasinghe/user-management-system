@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api/axiosConfig';
+import { validateEditForm } from '../utils/validation';
 
 function EditUser() {
   const { id } = useParams();
@@ -26,16 +27,22 @@ function EditUser() {
   }, [id]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
+  e.preventDefault();
+  setErrors({});
 
-    try {
-      const payload = { name, email };
-      if (password.trim() !== '') {
-        payload.password = password;
-      }
-      await api.put(`/users/${id}`, payload);
-      navigate('/users');
+  const validationErrors = validateEditForm({ name, email, password });
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  try {
+    const payload = { name, email };
+    if (password.trim() !== '') {
+      payload.password = password;
+    }
+    await api.put(`/users/${id}`, payload);
+    navigate('/users');
     } catch (err) {
       if (err.response && err.response.data) {
         const data = err.response.data;
