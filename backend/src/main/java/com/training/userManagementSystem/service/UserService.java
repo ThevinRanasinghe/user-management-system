@@ -29,7 +29,7 @@ public class UserService {
         User newUser = new User();
         newUser.setName(registerUser.getName());
         newUser.setEmail(registerUser.getEmail());
-        newUser.setPassword(registerUser.getEmail());
+        newUser.setPassword(registerUser.getPassword());
 
         User savedUser = userRepository.save(newUser);
         return savedUser;
