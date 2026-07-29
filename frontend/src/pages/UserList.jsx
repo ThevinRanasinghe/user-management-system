@@ -40,12 +40,12 @@ function UserList() {
   if (loading) return <p>Loading users...</p>;
 
   return (
-    <div>
+    <div className="page-container">
       <h2>All Users</h2>
       <Link to="/dashboard">Back to Dashboard</Link>
 
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p className="form-success">{message}</p>}
+      {error && <p className="form-error">{error}</p>}
 
       {users.length === 0 ? (
         <p>No users found.</p>
@@ -66,9 +66,9 @@ function UserList() {
                 <td>{u.name}</td>
                 <td>{u.email}</td>
                 <td>
-                  <Link to={`/users/edit/${u.id}`}>Edit</Link>
+                  <Link to={`/users/edit/${u.id}`} className="action-link">Edit</Link>
                   {' | '}
-                  <button onClick={() => handleDelete(u.id, u.name)}>Delete</button>
+                  <button className="delete-btn" onClick={() => handleDelete(u.id, u.name)}>Delete</button>
                 </td>
               </tr>
             ))}

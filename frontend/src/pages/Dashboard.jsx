@@ -20,7 +20,7 @@ function Dashboard(){
       }
 
   return (
-      <div>
+      <div className="dashboard-container">
         <h2>Welcome, {user.name}!</h2>
         <p>Email: {user.email}</p>
         <button onClick={handleLogout}>Logout</button>
