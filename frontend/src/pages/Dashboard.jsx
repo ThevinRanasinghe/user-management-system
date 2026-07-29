@@ -1,4 +1,4 @@
-import { Link, usenNavigate} from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function Dashboard(){
