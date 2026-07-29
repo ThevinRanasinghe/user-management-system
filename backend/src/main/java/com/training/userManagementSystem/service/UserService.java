@@ -70,7 +70,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot find User with id " + id));
         existingUser.setName(updateUser.getName());
         existingUser.setEmail(updateUser.getEmail());
-        existingUser.setPassword(updateUser.getPassword());
+
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
+            existingUser.setPassword(updateUser.getPassword());
+        }
+
         User updatedUser = userRepository.save(existingUser);
         return toResponse(updatedUser);
     }

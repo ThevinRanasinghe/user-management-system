@@ -17,7 +17,7 @@ public class UpdateUserRequest {
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotBlank(message = "Password cannot be Empty")
+
     @Size(min = 4,max = 15, message = "Password should be atleast 4 characters long")
     private String password;
 }

@@ -25,13 +25,16 @@ function EditUser() {
       });
   }, [id]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
 
     try {
-      await api.put(`/users/${id}`, { name, email, password });
+      const payload = { name, email };
+      if (password.trim() !== '') {
+        payload.password = password;
+      }
+      await api.put(`/users/${id}`, payload);
       navigate('/users');
     } catch (err) {
       if (err.response && err.response.data) {
@@ -50,48 +53,47 @@ function EditUser() {
   if (loading) return <p>Loading user...</p>;
 
   return (
-      <div>
-        <h2>Edit User</h2>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
-          </div>
-          <div>
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
-          </div>
-          <div>
-            <label>New Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter a new password"
-              required
-            />
-            {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
-          </div>
+    <div>
+      <h2>Edit User</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
+        </div>
+        <div>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
+        </div>
+        <div>
+          <label>New Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Leave blank to keep current password"
+          />
+          {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
+        </div>
 
-          {errors.general && <p style={{ color: 'red' }}>{errors.general}</p>}
+        {errors.general && <p style={{ color: 'red' }}>{errors.general}</p>}
 
-          <button type="submit">Save Changes</button>
-        </form>
-        <Link to="/users">Cancel</Link>
-      </div>
-    );
-  }
+        <button type="submit">Save Changes</button>
+      </form>
+      <Link to="/users">Cancel</Link>
+    </div>
+  );
+}
 
-  export default EditUser;
+export default EditUser;
