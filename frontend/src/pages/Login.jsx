@@ -18,7 +18,7 @@ function Login() {
 
     try {
       const response = await api.post('/login', { email, password });
-      console.log('Login successful:', response.data);
+      login(response.data);
       navigate('/dashboard');
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {
