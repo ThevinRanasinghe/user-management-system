@@ -23,9 +23,6 @@ function Dashboard(){
       <div>
         <h2>Welcome, {user.name}!</h2>
         <p>Email: {user.email}</p>
-        <nav>
-          <Link to="/users">View All Users</Link>
-        </nav>
         <button onClick={handleLogout}>Logout</button>
       </div>
     );
