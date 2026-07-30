@@ -8,6 +8,7 @@ import com.training.userManagementSystem.entity.User;
 import com.training.userManagementSystem.exception.BadRequestException;
 import com.training.userManagementSystem.exception.ResourceNotFoundException;
 import com.training.userManagementSystem.repository.UserRepository;
+import com.training.userManagementSystem.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     private UserResponse toResponse(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), null);
     }
 
     public UserResponse registerUser(RegisterRequest registerUser) {
@@ -52,7 +55,10 @@ public class UserService {
             throw new BadRequestException("Invalid Email or Password");
         }
 
-        return toResponse(user);
+        String token = jwtUtil.generateToken(user.getEmail());
+        UserResponse response = toResponse(user);
+        response.setToken(token);
+        return response;
     }
 
     public List<UserResponse> getAllUsers() {
