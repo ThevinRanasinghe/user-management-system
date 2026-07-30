@@ -9,6 +9,7 @@ import com.training.userManagementSystem.exception.BadRequestException;
 import com.training.userManagementSystem.exception.ResourceNotFoundException;
 import com.training.userManagementSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private UserResponse toResponse(User user) {
@@ -35,7 +38,7 @@ public class UserService {
         User newUser = new User();
         newUser.setName(registerUser.getName());
         newUser.setEmail(registerUser.getEmail());
-        newUser.setPassword(registerUser.getPassword());
+        newUser.setPassword(passwordEncoder.encode(registerUser.getPassword()));
 
         User savedUser = userRepository.save(newUser);
         return toResponse(savedUser);
@@ -45,7 +48,7 @@ public class UserService {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid Email or Password"));
 
-        if (!user.getPassword().equals(loginRequest.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new BadRequestException("Invalid Email or Password");
         }
 
@@ -72,7 +75,7 @@ public class UserService {
         existingUser.setEmail(updateUser.getEmail());
 
         if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
-            existingUser.setPassword(updateUser.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(updateUser.getPassword()));
         }
 
         User updatedUser = userRepository.save(existingUser);
