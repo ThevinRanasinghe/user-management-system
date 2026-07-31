@@ -58,4 +58,10 @@ public class UserController {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/users/search")
+    public ResponseEntity<List<UserResponse>> searchUsers(@RequestParam String query) {
+        List<UserResponse> results = userService.searchUsers(query);
+        return new ResponseEntity<>(results, HttpStatus.OK);
+    }
 }
