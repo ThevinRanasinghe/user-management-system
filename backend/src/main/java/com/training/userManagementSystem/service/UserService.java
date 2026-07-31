@@ -10,6 +10,8 @@ import com.training.userManagementSystem.exception.ResourceNotFoundException;
 import com.training.userManagementSystem.repository.UserRepository;
 import com.training.userManagementSystem.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,11 +63,9 @@ public class UserService {
         return response;
     }
 
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     public UserResponse getUserById(Long id) {
@@ -94,11 +94,9 @@ public class UserService {
         userRepository.delete(existingUser);
     }
 
-    public List<UserResponse> searchUsers(String query) {
+    public Page<UserResponse> searchUsers(String query, Pageable pageable) {
         return userRepository
-                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query)
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query, pageable)
+                .map(this::toResponse);
     }
 }
