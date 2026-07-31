@@ -26,17 +26,16 @@ public class User {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message="Name is Required, Please Enter Valid Name")
+
     @Column(nullable=false)
     private String name;
 
-    @NotBlank(message="Email is required")
-    @Email(message="Enter valid email")
+
     @Column(nullable=false,unique = true)
     private String email;
 
-    @NotBlank(message="Password is required")
-    @Size(min=4,max=50,message="Password should be length of more than 4 Characters")
+
+
     @Column(nullable=false)
     private String password;
 }
