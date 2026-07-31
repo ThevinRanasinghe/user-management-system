@@ -7,6 +7,7 @@ function UserList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -23,6 +24,32 @@ function UserList() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      if (searchQuery.trim() === '') {
+        await fetchUsers();
+      } else {
+        const response = await api.get('/users/search', {
+          params: { query: searchQuery },
+        });
+        setUsers(response.data);
+      }
+    } catch (err) {
+      setError('Search failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    fetchUsers();
+  };
 
   const handleDelete = async (id, name) => {
     const confirmed = window.confirm(`Delete user "${name}"? This cannot be undone.`);
@@ -42,7 +69,17 @@ function UserList() {
   return (
     <div className="page-container">
       <h2>All Users</h2>
-      <Link to="/dashboard">Back to Dashboard</Link>
+
+      <form onSubmit={handleSearch} style={{ marginBottom: '16px' }}>
+        <input
+          type="text"
+          placeholder="Search by name or email"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button type="submit">Search</button>
+        <button type="button" onClick={handleClearSearch}>Clear</button>
+      </form>
 
       {message && <p className="form-success">{message}</p>}
       {error && <p className="form-error">{error}</p>}
@@ -50,7 +87,7 @@ function UserList() {
       {users.length === 0 ? (
         <p>No users found.</p>
       ) : (
-        <table border="1" cellPadding="8">
+        <table>
           <thead>
             <tr>
               <th>ID</th>
@@ -67,7 +104,6 @@ function UserList() {
                 <td>{u.email}</td>
                 <td>
                   <Link to={`/users/edit/${u.id}`} className="action-link">Edit</Link>
-                  {' | '}
                   <button className="delete-btn" onClick={() => handleDelete(u.id, u.name)}>Delete</button>
                 </td>
               </tr>
