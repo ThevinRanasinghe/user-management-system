@@ -9,11 +9,30 @@ function UserList() {
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [sortBy, setSortBy] = useState('id');
+  const [direction, setDirection] = useState('asc');
+
+  const pageSize = 5;
+
   const fetchUsers = async () => {
     setLoading(true);
+    setError('');
     try {
-      const response = await api.get('/users');
-      setUsers(response.data);
+      const isSearching = searchQuery.trim() !== '';
+      const url = isSearching ? '/users/search' : '/users';
+      const params = {
+        page,
+        size: pageSize,
+        sortBy,
+        direction,
+        ...(isSearching && { query: searchQuery }),
+      };
+
+      const response = await api.get(url, { params });
+      setUsers(response.data.content);
+      setTotalPages(response.data.totalPages);
     } catch (err) {
       setError('Failed to load users.');
     } finally {
@@ -23,32 +42,28 @@ function UserList() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [page, sortBy, direction]);
 
-  const handleSearch = async (e) => {
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      if (searchQuery.trim() === '') {
-        await fetchUsers();
-      } else {
-        const response = await api.get('/users/search', {
-          params: { query: searchQuery },
-        });
-        setUsers(response.data);
-      }
-    } catch (err) {
-      setError('Search failed.');
-    } finally {
-      setLoading(false);
-    }
+    setPage(0);
+    fetchUsers();
   };
 
   const handleClearSearch = () => {
     setSearchQuery('');
-    fetchUsers();
+    setPage(0);
+    setTimeout(fetchUsers, 0);
+  };
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setDirection(direction === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setDirection('asc');
+    }
+    setPage(0);
   };
 
   const handleDelete = async (id, name) => {
@@ -58,10 +73,15 @@ function UserList() {
     try {
       await api.delete(`/users/${id}`);
       setMessage(`User "${name}" deleted successfully.`);
-      setUsers((prevUsers) => prevUsers.filter((u) => u.id !== id));
+      fetchUsers();
     } catch (err) {
       setError('Failed to delete user.');
     }
+  };
+
+  const sortIndicator = (field) => {
+    if (sortBy !== field) return '';
+    return direction === 'asc' ? ' ▲' : ' ▼';
   };
 
   if (loading) return <p>Loading users...</p>;
@@ -70,7 +90,7 @@ function UserList() {
     <div className="page-container">
       <h2>All Users</h2>
 
-      <form onSubmit={handleSearch} style={{ marginBottom: '16px' }}>
+      <form onSubmit={handleSearchSubmit} style={{ marginBottom: '16px' }}>
         <input
           type="text"
           placeholder="Search by name or email"
@@ -87,29 +107,45 @@ function UserList() {
       {users.length === 0 ? (
         <p>No users found.</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>
-                  <Link to={`/users/edit/${u.id}`} className="action-link">Edit</Link>
-                  <button className="delete-btn" onClick={() => handleDelete(u.id, u.name)}>Delete</button>
-                </td>
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                  Name{sortIndicator('name')}
+                </th>
+                <th onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
+                  Email{sortIndicator('email')}
+                </th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td>{u.id}</td>
+                  <td>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td>
+                    <Link to={`/users/edit/${u.id}`} className="action-link">Edit</Link>
+                    <button className="delete-btn" onClick={() => handleDelete(u.id, u.name)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+              Previous
+            </button>
+            <span>Page {page + 1} of {totalPages}</span>
+            <button disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>
+              Next
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
