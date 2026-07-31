@@ -93,4 +93,12 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot find User with id " + id));
         userRepository.delete(existingUser);
     }
+
+    public List<UserResponse> searchUsers(String query) {
+        return userRepository
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 }
